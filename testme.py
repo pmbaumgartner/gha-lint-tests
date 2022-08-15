@@ -1,9 +1,3 @@
 def func():
+    "docstring"
     return 1
-
-
-""
-
-print("F")
-
-# TODO: Remove print

@@ -1,0 +1,5 @@
+# spaCy project specific
+
+models/
+corpus/
+package/
