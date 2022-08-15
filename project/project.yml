@@ -1,0 +1,164 @@
+title: "Example sTP Project Template"
+description: >
+  This is an example project description.
+
+  Type stuff here to describe the project.
+
+vars:
+  lang: "en"
+  assembled_path: "models/archetyp"
+  package_name: "archetyp"
+  package_version: "0.0.4"
+  gpu: -1
+  scripts_for_package: "components/matchers/age_ranges.py,\
+    components/finalizer/finalizer.py,\
+    components/schema.py"
+
+spacy_version: ">=3.4.0,<4.0.0"
+
+# These are the directories that the project needs. The project CLI will make
+# sure that they always exist.
+directories:
+  - "assets"
+  - "scripts"
+  - "corpus"
+  - "configs"
+  - "models"
+  - "package"
+  - "debug"
+
+assets:
+  - dest: "assets/${vars.annotated_data}"
+    checksum: 0b6b1b9dc933c66e9f6669f1dde6f374
+    description: >
+      Original annotated data that was previously sent. Originally called age.csv, this contains
+      rows of spans and up to 2 annotated age ranges from those spans.
+
+workflows:
+  all:
+    - assemble
+    - convert_gold_csv_to_jsonl
+    - evaluate
+    - package
+
+commands:
+  - name: assemble
+    help: Assembles from matcher and finalizer
+    script:
+      - >-
+        python -m spacy assemble configs/config.cfg
+        ${vars.assembled_path} 
+        --code components/code.py
+        --paths.model ${vars.base_model}
+
+  - name: convert_unlabeled_json_to_jsonl
+    help: "Convert the unannotated data to spaCy's format"
+    script:
+      - >-
+        python scripts/convert.py
+        unlabeled-json-to-jsonl 
+        assets/${vars.unannotated_data_stem}.json 
+        corpus/${vars.unannotated_data_stem}.jsonl
+    deps:
+      - "assets/${vars.unannotated_data_stem}.json"
+    outputs:
+      - "corpus/${vars.unannotated_data_stem}.jsonl"
+
+  - name: convert_gold_csv_to_jsonl
+    help: "Convert the unannotated data to spaCy's format"
+    script:
+      - >-
+        python scripts/convert.py
+        gold-csv-to-jsonl 
+        assets/${vars.annotated_data}
+        corpus/${vars.gold_data}
+    deps:
+      - assets/${vars.annotated_data}
+    outputs:
+      - corpus/${vars.gold_data}
+
+  - name: rules_to_patterns
+    help: "Convert Matcher Rules to patterns file for Prodigy"
+    script:
+      - >-
+        python scripts/rules_to_patterns.py
+        ${vars.rules_registry}
+        prodigy/patterns/${vars.output_patterns}.jsonl
+    outputs:
+      - prodigy/patterns/${vars.output_patterns}.jsonl
+
+  - name: prodigy_spans_manual
+    help: "Prodigy recipe to label spans with age matcher rules."
+    script:
+      - >-
+        python -m prodigy
+        spans.manual
+        ${vars.prodigy_dataset} 
+        en_core_web_sm
+        corpus/${vars.unannotated_data_stem}.jsonl
+        --label single_matches,range_matches
+        --patterns prodigy/patterns/${vars.output_patterns}.jsonl
+    deps:
+      - corpus/${vars.unannotated_data_stem}.jsonl
+      - prodigy/patterns/${vars.output_patterns}.jsonl
+
+  - name: prodigy_spans_model
+    help: "Prodigy recipe to label spans with matcher from en_archetyp."
+    script:
+      - >-
+        python -m prodigy
+        age_range_spans
+        ${vars.prodigy_dataset} 
+        en_archetyp
+        corpus/${vars.unannotated_data_stem}.jsonl
+        single_matches,range_matches,merge
+        -F prodigy/${vars.prodigy_recipe}.py
+    deps:
+      - corpus/${vars.unannotated_data_stem}.jsonl
+
+  - name: evaluate
+    help: "Evaluate on the test data and save the metrics"
+    script:
+      - >-
+        python scripts/evaluate.py
+        ${vars.assembled_path}
+        corpus/${vars.gold_data}
+        debug
+    deps:
+      - "${vars.assembled_path}"
+      - "corpus/${vars.gold_data}"
+
+  - name: package
+    help: "Package the model so it can be installed"
+    script:
+      - >-
+        python -m spacy package 
+        ${vars.assembled_path} package 
+        --name ${vars.package_name} 
+        --code ${vars.scripts_for_package}
+        --build wheel,sdist
+        --meta-path meta.json
+        --version ${vars.package_version}
+        --force
+    deps:
+      - "models/archetyp"
+    outputs_no_cache:
+      - "package/${vars.lang}_${vars.package_name}-${vars.package_version}/dist/en_${vars.package_name}-${vars.package_version}.tar.gz"
+
+  - name: install_packaged_model
+    help: "Install the packaged model to enable loading from spacy.load('en_archetyp')."
+    script:
+      - "pip install package/en_${vars.package_name}-${vars.package_version}"
+
+  - name: clean
+    help: "Remove intermediate files"
+    script:
+      - "rm -rf models"
+      - "rm -rf metrics"
+      - "rm -rf corpus"
+      - "rm -rf package"
+
+  - name: clean-dataset
+    help: "Drop Prodigy datasets"
+    script:
+      - "python -m prodigy drop ${vars.prodigy_dataset}"
