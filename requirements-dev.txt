@@ -1,0 +1,17 @@
+# Development Requirements
+# These are files that help in developing the model, but are not 
+# essential to build and package the model.
+
+# We run all of the checks through pre-commit as sort of a "CI Runner"
+pre-commit==2.20.0
+
+flake8==5.0.4
+flake8-docstrings==1.6.0  # This will find functions without docstrings
+flake8-fixme==1.1.1  # this will find "TODO" and "FIXME" items in code
+flake8-print==5.0.0  # this will find any print statements in code
+
+black==22.6.0
+
+isort==5.10.1
+
+mypy==0.971
