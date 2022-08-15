@@ -15,6 +15,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-      - name: Analysing the code with pylint
-        run: |
-          echo "::warning file=test.txt,line=1::Here's a warning for the text file"
+          python -m pip install -r requirements-dev.txt
+      - name: black
+        run: black --check --diff .
