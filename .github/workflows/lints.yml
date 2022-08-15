@@ -17,4 +17,4 @@ jobs:
           python -m pip install --upgrade pip
       - name: Analysing the code with pylint
         run: |
-          echo "::warning file=test.txt,line=1,col=1,endColumn=3::Here's a warning for the text file"
+          echo "::warning file=test.txt,line=1::Here's a warning for the text file"
