@@ -1,66 +1,6 @@
-from .stuff import shit
-
-import functools
+"""Public Module test."""
 
 
 def func():
-    'Docstring.'
+    """Docstring."""
     return 1
-
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-
-def func():
-    'Docstring.'
-    return 1
-    
-print("NO")
-
-# TODO: Wee

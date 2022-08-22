@@ -1,0 +1,12 @@
+# An action for removing internal files from a project repository and zipping for client delivery.
+
+name: Delivery
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: explosion/stp-delivery-gh-action@v1
