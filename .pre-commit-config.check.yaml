@@ -13,7 +13,7 @@ repos:
         verbose: true
       - id: black
         name: black
-        entry: black --check --diff --extend-exclude '.**/*'.
+        entry: black --check --diff .
         language: system
         types: [python]
         require_serial: true
