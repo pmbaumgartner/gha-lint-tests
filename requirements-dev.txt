@@ -3,7 +3,11 @@
 # essential to build and package the model.
 
 # # We run all of the checks through pre-commit as sort of a "CI Runner"
-# pre-commit==2.20.0
+pre-commit==2.20.0
+
+# Ipython for development REPL
+ipython==8.4.0
+
 
 flake8==5.0.4
 flake8-docstrings==1.6.0  # This will find functions without docstrings

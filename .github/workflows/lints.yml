@@ -16,27 +16,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
-  flake8:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: flake8
-        run: flake8
-  black:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: black
-        run: black --check --diff .
-  isort:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: isort
-        run: isort --diff .
-  mypy:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: mypy
-        run: mypy --follow-imports=silent --ignore-missing-imports --show-column-numbers --no-pretty .
+      - name: Run all pre-commit checks
+        run: pre-commit run --all-files --hook-stage manual -c .pre-commit-config.check.yaml
+      # - name: flake8
+      #   run: flake8 project/
+      # - name: black
+      #   run: black --check --diff project/
+      # - name: isort
+      #   run: isort --diff project/
+      # - name: mypy
+      #   run: mypy --follow-imports=silent --ignore-missing-imports --show-column-numbers --no-pretty project/
