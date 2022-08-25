@@ -48,6 +48,8 @@ If you've used pre-commit before, you'll know that the default setting is to run
 
 Instead of annoyingly auto-running the hooks, the automation of running the linters occurs in CI with GitHub Actions on a pull request. It is recommended to protect the `main` branch and turn off pushes to `main`, and enforce the constraint that code changes have to come from a pull request. In this way, the pull request represents a "bundle" of code that should pass the required CI checks, so you know that any code in `main` has passed all the linters. A developer can use the pull request checks to understand which are failing, execute the `run` hook locally as outlined above to fix any formatting issues and identify linting issues needing fixes.
 
+In addition, local use allows us to specify our own hooks for customization rather than using pre-defined hooks that need to be pulled from existing repository. It also serves as a sanity check that the development requirements are installed, and it'll use the installed packages to run the checks rather than a separate python interpreter.
+
 ### Checking that example files and logic are removed
 
 Since this is a fully functional example project, you'll want to ensure any of the example code is gone from the repository before delivery if you were actually using this for a project. You can search for the strings I used to identify this as an example with the following command:
