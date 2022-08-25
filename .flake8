@@ -2,6 +2,6 @@
 max-line-length = 88
 ; Add T, D to `select` for prints, todos, and docstrings
 select = C,E,F,W,B,B950,T,D
-extend-ignore = E203, E501
+extend-ignore = E203, E501, D401, D205, D400
 exclude = 
     .**/*

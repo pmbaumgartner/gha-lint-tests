@@ -8,3 +8,8 @@ extend-exclude = '''
   \.github/    # exclude a file named foo.py in the root of the project
 )
 '''
+
+[tool.pyright]
+include = ["project"]
+exclude = ["**/__pycache__"]
+typeCheckingMode = "basic"

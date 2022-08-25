@@ -5,13 +5,13 @@ repos:
     hooks:
       - id: flake8
         name: flake8
-        entry: flake8
+        entry: flake8 project/
         language: system
         types: [python]
         require_serial: true
       - id: black
         name: black
-        entry: black .
+        entry: black project/
         language: system
         types: [python]
         require_serial: true
@@ -19,13 +19,13 @@ repos:
         verbose: true
       - id: isort
         name: isort
-        entry: isort .
+        entry: isort project/
         language: system
         types: [python]
         require_serial: true
-      - id: mypy
-        name: mypy
-        entry: mypy --follow-imports=silent --ignore-missing-imports --show-column-numbers --no-pretty .
+      - id: pyright
+        name: pyright
+        entry: pyright project/
         language: system
         types: [python]
         require_serial: true

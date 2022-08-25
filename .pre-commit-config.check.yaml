@@ -5,33 +5,28 @@ repos:
     hooks:
       - id: flake8
         name: flake8
-        entry: flake8
+        entry: flake8 project/
         language: system
         types: [python]
         require_serial: true
-        log_file: .flake8.log
         verbose: true
       - id: black
         name: black
-        entry: black --check --diff .
+        entry: black --check --diff project/
         language: system
         types: [python]
         require_serial: true
-        log_file: .black.log
-        verbose: true
       - id: isort
         name: isort
-        entry: isort --diff .
+        entry: isort --diff --check project/
         language: system
         types: [python]
         require_serial: true
-        log_file: .isort.log
         verbose: true
-      - id: mypy
-        name: mypy
-        entry: mypy --follow-imports=silent --ignore-missing-imports --show-column-numbers --no-pretty .
+      - id: pyright
+        name: pyright
+        entry: pyright project/
         language: system
         types: [python]
         require_serial: true
-        log_file: .mypy.log
         verbose: true
