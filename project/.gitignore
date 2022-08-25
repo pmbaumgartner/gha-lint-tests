@@ -1,0 +1,24 @@
+# spaCy project specific
+
+# Corpus should be generated from files in `assets`
+corpus/
+
+# This is only temporary, we don't want to store the packaged model
+# with the repo
+package/
+
+# This is for intermediate debugging and logging output
+debug/
+
+# Full models shouldn't be included in the repo, but we want
+# trainable components so that we can use model weights if
+# a component has already been trained. This is so others developing
+# the model can use the same weights, but also so that the model can be
+# assembled in a GH Action. In short, any models with
+# weights that need to be sourced should not be ignored,
+# but included in Git LFS.
+# gitignore pattern from https://stackoverflow.com/a/5534865
+!models/
+
+models/*
+!models/trainable/

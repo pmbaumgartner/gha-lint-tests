@@ -1,0 +1,126 @@
+title: "Example sTP Project Template"
+description: >
+  This is an example project description.
+
+  Type stuff here to describe the project.
+
+vars:
+  lang: "en"
+  base_model: "en_core_web_md"
+  trained_model_path: "models/trainable"
+  assembled_path: "models/stp-example"
+  package_name: "stp-example"
+  package_version: "0.0.1"
+  gpu: -1
+  scripts_for_package: "components/matcher.py"
+
+spacy_version: ">=3.4.0,<4.0.0"
+
+# These are the directories that the project needs. The project CLI will make
+# sure that they always exist.
+directories:
+  - "assets"
+  - "scripts"
+  - "corpus"
+  - "configs"
+  - "models"
+  - "package"
+  - "debug"
+
+assets:
+  - dest: "assets/sst2-train.tsv"
+    checksum: 65c23c19d5482e31efac7090ee234e6c
+    description: >
+      An example file from the Stanford Sentiment Treebank. 
+      ref: https://nlp.stanford.edu/sentiment/index.html
+  - dest: "assets/sst2-test.tsv"
+    checksum: 77d68b65899229a6ae3051de69622e2f
+    description: >
+      An example file from the Stanford Sentiment Treebank. 
+      ref: https://nlp.stanford.edu/sentiment/index.html
+
+workflows:
+  all:
+    - setup
+    - convert_data
+    - train
+    - assemble
+    - evaluate
+    - package
+
+commands:
+  - name: setup
+    help: Runs setup checks for model and development
+    script:
+      - python scripts/commands.py git-lfs-installed
+      - python scripts/commands.py download-model ${vars.base_model}
+
+  - name: convert_data
+    help: "Convert the data to spaCy's format"
+    script:
+      - >-
+        python scripts/commands.py 
+        convert 
+        assets/sst2-train.tsv 
+        corpus/train.spacy
+      - >-
+        python scripts/commands.py 
+        convert 
+        assets/sst2-test.tsv 
+        corpus/test.spacy
+
+  - name: train
+    help: "Train the example textcat model"
+    script:
+      - >-
+        python -m spacy train configs/trainable.cfg
+        --paths.train corpus/train.spacy
+        --paths.dev corpus/test.spacy
+        --output ${vars.trained_model_path}
+        --gpu-id ${vars.gpu}
+
+  - name: assemble
+    help: Assembles model from trainable and static components
+    script:
+      - >-
+        spacy assemble configs/full.cfg 
+        ${vars.assembled_path} 
+        --code components/code.py 
+        --paths.trainable_components ${vars.trained_model_path}/model-best
+
+  - name: evaluate
+    help: "Evaluate on the test data and save the metrics"
+    script:
+      - >-
+        python -m spacy evaluate 
+        ${vars.assembled_path}
+        corpus/test.spacy
+        --code components/code.py
+        --output debug/textcat_evaluation.json
+    deps:
+      - "${vars.assembled_path}"
+
+  - name: package
+    help: "Package the model so it can be installed"
+    script:
+      - >-
+        python -m spacy package
+        ${vars.assembled_path} package
+        --code ${vars.scripts_for_package}
+        --build wheel,sdist
+        --meta-path meta.json
+        --version ${vars.package_version}
+        --force
+    deps:
+      - ${vars.assembled_path}
+    outputs_no_cache:
+      - "package/${vars.lang}_${vars.package_name}-${vars.package_version}/dist/${vars.lang}_${vars.package_name}-${vars.package_version}.tar.gz"
+      - "package/${vars.lang}_${vars.package_name}-${vars.package_version}/dist/${vars.lang}_${vars.package_name}-${vars.package_version}-py3-none-any.whl"
+
+  - name: clean
+    help: "Remove intermediate files"
+    script:
+      - "rm -rf models"
+      - "rm -rf metrics"
+      - "rm -rf corpus"
+      - "rm -rf package"

@@ -1,0 +1,63 @@
+# This publishes the model to our internal PyPI repo, which is then used
+# to pull the model into the docker image for the API
+# for more info, use this and follow the instructions:
+# https://github.com/explosion/demo-hello-world/tree/template
+name: Publish to CodeArtifact
+
+# This is manually triggered, since there might already be
+# an existing version of this package in the repo, you wouldn't
+# want it to automatically run on every push or PR.
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: "eu-central-1"
+  AWS_ACCOUNT_ID: "986656860062"
+  PACKAGE_NAME: en_stp_example
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    name: publish-to-codeartifact
+
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          lfs: "true"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/gha-${{ github.event.repository.name }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log into CodeArtifact
+        run: |
+          aws codeartifact login --tool twine --repository ${{ github.event.repository.name }} --domain python --domain-owner ${{ env.AWS_ACCOUNT_ID }}
+          echo "TWINE_PASSWORD=`aws codeartifact get-authorization-token --domain python --domain-owner ${{ env.AWS_ACCOUNT_ID }} --query authorizationToken --output text`" >> $GITHUB_ENV
+          echo "TWINE_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain python --domain-owner ${{ env.AWS_ACCOUNT_ID }} --repository ${{ github.event.repository.name }} --format pypi --query repositoryEndpoint --output text`" >> $GITHUB_ENV
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: Install Deps
+        env:
+          TWINE_USERNAME: "aws"
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install twine wheel
+      - name: Build and Upload
+        env:
+          TWINE_USERNAME: "aws"
+        working-directory: project
+        run: |
+          pip install -e .
+          python -m spacy project run all
+          twine upload --repository pypi_mirror package/${{ env.PACKAGE_NAME }}-*/dist/${{ env.PACKAGE_NAME }}-*.tar.gz --verbose --skip-existing

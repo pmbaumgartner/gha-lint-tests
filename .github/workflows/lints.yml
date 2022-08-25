@@ -3,7 +3,7 @@ name: Lint
 on: pull_request
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,5 +16,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
-      - name: black
-        run: black --check --diff .
+      - name: Run all pre-commit checks
+        run: pre-commit run --all-files --hook-stage manual -c .pre-commit-config.check.yaml
+      # - name: flake8
+      #   run: flake8 project/
+      # - name: black
+      #   run: black --check --diff project/
+      # - name: isort
+      #   run: isort --diff project/
+      # - name: mypy
+      #   run: mypy --follow-imports=silent --ignore-missing-imports --show-column-numbers --no-pretty project/
