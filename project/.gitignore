@@ -1,5 +1,21 @@
 # spaCy project specific
 
-models/
+# Corpus should be generated from files in `assets`
 corpus/
+
+# This is only temporary, we don't want to store the packaged model
+# with the repo
 package/
+
+# This is for intermediate debugging and logging output
+debug/
+
+# Full models shouldn't be included here, but we might want
+# trainable components so that we can use model weights if
+# the model has already been trained. In essence, any models with
+# weights that need to be sourced should not be ignored.
+# gitignore pattern from https://stackoverflow.com/a/5534865
+!models/
+
+models/*
+!models/trainable/

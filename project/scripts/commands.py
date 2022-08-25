@@ -3,14 +3,14 @@ then they're usually called with arguments from the project.yml file
 """
 
 from pathlib import Path
-
 from subprocess import run
+import sys
 
 import spacy
 import typer
-from spacy.tokens import DocBin
-
 import wasabi
+from spacy.tokens import DocBin
+from spacy.cli.download import download
 
 app = typer.Typer()
 
@@ -71,6 +71,22 @@ def git_lfs_installed():
         msg.fail("Git LFS Not Installed. See: https://git-lfs.github.com/")
     else:
         msg.good(f"Git LFS Installed!\n{cmd.stdout.decode()}")
+
+
+@app.command()
+def download_model(model: str):
+    """Command to download a specific model. Same as
+    `spacy download <model>`, but will check if the model is
+    already installed first.
+
+    This is an example command, you should remove it if you don't need it.
+    """
+    cmd = run([sys.executable, "-m", "pip", "show", model], capture_output=True)
+    not_installed = "WARNING:" in cmd.stderr.decode()
+    if not_installed:
+        download(model)
+    else:
+        msg.good(f"{model} already installed.")
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 # Development Requirements
-# These are files that help in developing the model, but are not 
+# These are libraries that help in developing the model, but are not 
 # essential to build and package the model.
 
-# # We run all of the checks through pre-commit as sort of a "CI Runner"
+# We run all of the checks through pre-commit as sort of a "CI Runner"
 pre-commit==2.20.0
 
 # Ipython for development REPL
@@ -18,4 +18,4 @@ black==22.6.0
 
 isort==5.10.1
 
-mypy==0.971
+pyright==1.1.267
