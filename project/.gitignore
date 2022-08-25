@@ -12,8 +12,9 @@ debug/
 
 # Full models shouldn't be included here, but we might want
 # trainable components so that we can use model weights if
-# the model has already been trained. In essence, any models with
-# weights that need to be sourced should not be ignored.
+# the model has already been trained. Any models with
+# weights that need to be sourced should not be ignored, but included
+# in Git LFS.
 # gitignore pattern from https://stackoverflow.com/a/5534865
 !models/
 
