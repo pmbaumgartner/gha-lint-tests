@@ -8,7 +8,7 @@ Here's what's different in this project compared to copying a project template o
 - Uses [`Git LFS`](https://git-lfs.github.com/) to store large files that don't need diffs (model weights, source data)
 - An example [`typer`](https://typer.tiangolo.com/) script for commands (commonly used for data processing)
 - Has relevant [`GitHub Actions`](https://docs.github.com/en/actions) for:
-  - Running all the pre-commit checks on a pull request
+  - Running all the pre-commit hooks on a pull request
   - Running an end-to-end test of the main project workflow to ensure a packaged model can be installed and run
   - Publishing the model package to our internal PyPI repo (for use with the evaluation API)
   - Delivering the model code as a `.zip` file with internal data removed from the source code.
@@ -28,8 +28,8 @@ Once the requirements are installed, you'll need to set up pre-commit. We run th
 
 Install pre-commit with:
 
-```
-pre-commit install
+```bash
+pre-commit install --allow-missing-config
 ```
 
 Pre-commit only works on files that you have previously committed to the repo. Since you removed the git history when you cloned the repo, you'll need to the commit the files in the repository. Then you can run pre-commit with the following commands:
